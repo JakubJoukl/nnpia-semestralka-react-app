@@ -1,0 +1,26 @@
+div .mainLayout{
+    padding: 10px;
+    background-color:rgb(65,74,76);
+    justify-content: space-between;
+}
+div {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 0;
+    text-align: center;
+}
+div .rightLayout > p {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+div .leftLayout, div .rightLayout{
+    justify-content: center;
+    align-items: center;
+}
+div .leftLayout {
+    flex-grow: 0;
+}
+div .rightLayout > * {
+    margin-left: 10px;
+}

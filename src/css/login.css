@@ -1,0 +1,27 @@
+.noGrow {
+    display: flex;
+    flex-direction: column;
+    margin-right: 5px;
+}
+
+.loginContainer{
+    display: flex;
+    justify-content: flex-start;
+}
+.loginButton{
+    background-color: #3f82cc;
+    border: 0px;
+    box-shadow: 0px 0px 2px 2px #3f82cc;
+    box-sizing: border-box;
+    border-radius: 4px;
+    color: whitesmoke;
+    font-weight: 700;
+}
+.loginInput{
+    all: unset;
+    background-color: #3f82cc;
+    border: 0px;
+    border-radius: 4px;
+    padding: 5px;
+    margin-right: 5px;
+}
