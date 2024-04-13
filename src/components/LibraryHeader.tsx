@@ -16,14 +16,7 @@ import logoImg from "../assets/logo.png";
 import "../css/image.css";
 import { ButtonBase } from "@mui/material";
 import Login from "./Login";
-
-const pages = [
-  "Kalendář termínů",
-  "Moje rezervované termíny",
-  "Vypsané termíny",
-];
-//let selectedPage = 0;
-//const [selectedIndex, setSelectedIndex] = useState(1);
+import { Link } from "react-router-dom";
 
 const settings = ["Odhlásit se"];
 
@@ -59,12 +52,43 @@ function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
+  function additionalPages() {
+    return (
+      <>
+        <Link to="/kalendarTerminu">
+          <Button
+            onClick={handleCloseNavMenu}
+            sx={{ my: 2, color: "white", display: "block" }}
+          >
+            Kalendář
+          </Button>
+        </Link>
+        <Link to="/mojeTerminy">
+          <Button
+            onClick={handleCloseNavMenu}
+            sx={{ my: 2, color: "white", display: "block" }}
+          >
+            Moje termíny
+          </Button>
+        </Link>
+        <Link to="/volneTerminy">
+          <Button
+            onClick={handleCloseNavMenu}
+            sx={{ my: 2, color: "white", display: "block" }}
+          >
+            Volné termíny
+          </Button>
+        </Link>
+      </>
+    );
+  }
+
   console.log(username, jwtToken, setUsername, setJwtToken);
 
   function logoutPart() {
     return (
       <Box sx={{ flexGrow: 0 }}>
-        <Tooltip title="Open settings">
+        <Tooltip title="Nastavení">
           <ButtonBase onClick={handleOpenUserMenu} sx={{ p: 0 }}>
             Uživatel {username}
           </ButtonBase>
@@ -149,13 +173,7 @@ function ResponsiveAppBar() {
               sx={{
                 display: { xs: "block", md: "none" },
               }}
-            >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
+            ></Menu>
           </Box>
           <Typography
             variant="h5"
@@ -176,15 +194,15 @@ function ResponsiveAppBar() {
             Rezervace termínů
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
+            <Link to="/">
               <Button
-                key={page}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
-                {page}
+                O mě
               </Button>
-            ))}
+            </Link>
+            {username == null || jwtToken == null ? "" : additionalPages()}
           </Box>
 
           {username == null || jwtToken == null ? loginPart() : logoutPart()}

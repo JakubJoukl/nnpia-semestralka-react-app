@@ -3,31 +3,18 @@
 import "./index.css";
 import LibraryHeader from "./components/LibraryHeader";
 import { UserProvider } from "./components/UserContext";
-
-/*let username = "";
-if (sessionStorage.getItem("jwt") != null) {
-  let tokens = sessionStorage.getItem("jwt")!.split(".");
-  let tokenScope = JSON.parse(atob(tokens[1]));
-  console.log(tokenScope);
-  username = tokenScope.sub;
-}*/
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./components/HomePage";
+import ErrorPage from "./components/ErrorPage";
+import RoutesWithContext from "./components/RoutesWithContext";
 
 function App() {
   return (
-    /*<Header
-      rightSide={
-        sessionStorage.getItem("jwt") == null ? (
-          <Login>''</Login>
-        ) : (
-          <p>Vítej {username}</p>
-        )
-      }
-    >
-      NNPIA rezervační systém
-    </Header>
-    */
     <UserProvider>
-      <LibraryHeader></LibraryHeader>
+      <Router>
+        <LibraryHeader></LibraryHeader>
+        <RoutesWithContext></RoutesWithContext>
+      </Router>
     </UserProvider>
   );
 }
