@@ -1,5 +1,5 @@
 .myGrid{
     background-color: #ffff !important;
     border-radius: 0px !important;
-    height: 100%;
+    flex-grow: 1;
 }

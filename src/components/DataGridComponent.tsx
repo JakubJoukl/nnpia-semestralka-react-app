@@ -4,34 +4,35 @@ import {
   GridActionsCellItem,
   GridColDef,
   GridRowId,
-  GridRowModes,
 } from "@mui/x-data-grid";
-import { createFakeServer } from "@mui/x-data-grid-generator";
 import "../css/datagrid.css";
 import IconButton from "@mui/material/IconButton";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import UserContext from "./UserContext";
+import moment from "moment";
 
 const SERVER_OPTIONS = {
   useCursorPagination: false,
 };
 
 // Vlastní asynchronní funkce pro získání dat
-const fetchData = async (paginationModel, jwtToken) => {
-  const { page, pageSize } = paginationModel;
+const fetchData = async (paginationModel, jwtToken, method, url) => {
+  const { page } = paginationModel;
   // Zde provedete svůj asynchronní požadavek na získání dat z vašeho API
   // Například:
-  const response = await fetch(
-    `http://localhost:8080/api/v1/terminyUzivatele/?pageNumber=${page}&asc=true`,
-    {
-      method: "GET",
-      mode: "cors",
-      headers: {
-        "Content-Type": "text/plain;charset=UTF-8",
-        Authorization: "Bearer " + jwtToken,
-      },
-    }
-  );
+  let pageInfo = url.includes("?")
+    ? `&pageNumber=${page}&asc=true`
+    : `?pageNumber=${page}&asc=true`;
+
+  const response = await fetch(url + pageInfo, {
+    method: method,
+    mode: "cors",
+    headers: {
+      "Content-Type": "text/plain;charset=UTF-8",
+      Authorization: "Bearer " + jwtToken,
+    },
+  });
   const data = await response.json();
   console.log(data);
   return data;
@@ -39,78 +40,84 @@ const fetchData = async (paginationModel, jwtToken) => {
 
 export default function ServerPaginationGrid({
   columns,
-  requestForData,
-  deleteFunction,
+  requestUrl,
+  method,
+  includeDelete,
+  doDeleteAction,
+  rowIdSource,
+  includeUpdate,
+  doUpdateAction,
+  trackedDate,
 }) {
   const [username, setUsername, jwtToken, setJwtToken] =
     React.useContext(UserContext);
 
-  const cols: GridColDef[] = [
-    {
-      field: "stavRezervace",
-      headerName: "Stav rezervace",
-      width: 200,
-    },
-    {
-      field: "vypsanyTermin",
-      headerName: "Trvání termínu od",
-      flex: 1,
-      valueGetter: (params) => {
-        //console.log(params);
-        return params.trvaniOd;
-      },
-    },
-    {
-      field: "vypsanyTermin",
-      headerName: "Trvání termínu do",
-      flex: 1,
-      valueGetter: (params) => {
-        //console.log(params);
-        return params.trvaniDo;
-      },
-    },
-    {
-      field: "poznamkaLekare",
-      headerName: "Poznámka lékaře",
-      flex: 1,
-    },
-    {
-      field: "actions",
-      type: "actions",
-      headerName: "Actions",
-      width: 100,
-      cellClassName: "actions",
-      getActions: ({ id }) => {
-        return [
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={handleDeleteClick(id)}
-            color="inherit"
-          />,
-        ];
-      },
-    },
-    // Další sloupce...
-  ];
-
   const [paginationModel, setPaginationModel] = React.useState({
     page: 0,
-    pageSize: 5,
+    pageSize: 10,
   });
   const [isLoading, setIsLoading] = React.useState(false);
   const [rows, setRows] = React.useState([]);
   const [rowCountState, setRowCountState] = React.useState(0);
+  const [requestUrlUsedInRequest, setRequestUrlUsedInRequest] =
+    React.useState(requestUrl);
 
-  const handleDeleteClick = (id: GridRowId) => () => {
-    console.log(id);
-    fetchDataAndUpdateState();
+  // Funkce pro vytvoření sloupce Actions
+  const createActionsColumn = () => {
+    return {
+      field: "actions",
+      type: "actions",
+      headerName: "Akce",
+      width: 100,
+      cellClassName: "actions",
+      getActions: ({ id }) => {
+        let returnedRows = [];
+        if (includeUpdate != null && doUpdateAction != null) {
+          returnedRows.push(
+            <GridActionsCellItem
+              key={id}
+              icon={<AddCircleIcon />}
+              label="Update"
+              onClick={async () => {
+                await doUpdateAction(id);
+                console.log("PAWNS");
+                fetchDataAndUpdateState();
+              }}
+              color="inherit"
+            />
+          );
+        }
+        if (includeDelete != null && doDeleteAction != null) {
+          returnedRows.push(
+            <GridActionsCellItem
+              key={id}
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={async () => {
+                await doDeleteAction(id);
+                console.log("PAWNS");
+                fetchDataAndUpdateState();
+              }}
+              color="inherit"
+            />
+          );
+        }
+        return returnedRows;
+      },
+    };
   };
 
   const fetchDataAndUpdateState = async () => {
+    console.log("MITTENS");
     setIsLoading(true);
     try {
-      const data = await fetchData(paginationModel, jwtToken);
+      const data = await fetchData(
+        paginationModel,
+        jwtToken,
+        method,
+        requestUrlUsedInRequest
+      );
+      console.log("SNOW");
       setRows(data.data); // Nastavte nová data
       setRowCountState(data.pocet); // Nastavte celkový počet řádků
     } catch (error) {
@@ -124,15 +131,40 @@ export default function ServerPaginationGrid({
     fetchDataAndUpdateState();
   }, [paginationModel]);
 
+  if (trackedDate != null) {
+    React.useEffect(() => {
+      console.log("Kocka");
+      setRequestUrlUsedInRequest(
+        `http://localhost:8080/api/v1/vypsaneTerminy/${trackedDate["$D"]}-${
+          trackedDate["$M"] + 1
+        }-${trackedDate["$y"]}`
+      );
+      console.log(requestUrlUsedInRequest);
+    }, [trackedDate]);
+  }
+
+  React.useEffect(() => {
+    console.log(requestUrlUsedInRequest);
+    fetchDataAndUpdateState();
+  }, [requestUrlUsedInRequest]);
+
   return (
-    <div style={{ height: "100%", width: "100%" }}>
+    <div style={{ width: "100%", flexGrow: 1 }}>
       <DataGrid
         className="myGrid"
         rows={rows}
-        getRowId={(row) => row.rezervaceTerminuId}
-        columns={cols}
+        getRowId={(row) => row[rowIdSource]}
+        columns={
+          includeDelete || includeUpdate
+            ? [...columns, createActionsColumn()]
+            : columns
+        }
         rowCount={rowCountState}
         loading={isLoading}
+        localeText={{
+          noRowsLabel: "Žádné výsledky",
+          noResultsOverlayLabel: "Žádné výsledky",
+        }}
         pageSizeOptions={[10]}
         paginationModel={paginationModel}
         paginationMode="server"

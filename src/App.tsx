@@ -7,15 +7,22 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./components/HomePage";
 import ErrorPage from "./components/ErrorPage";
 import RoutesWithContext from "./components/RoutesWithContext";
+import { ThemeProvider } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
+import { csCZ as coreCsCZ } from "@mui/material/locale";
+
+const theme = createTheme(coreCsCZ);
 
 function App() {
   return (
-    <UserProvider>
-      <Router>
-        <LibraryHeader></LibraryHeader>
-        <RoutesWithContext></RoutesWithContext>
-      </Router>
-    </UserProvider>
+    <ThemeProvider theme={theme}>
+      <UserProvider>
+        <Router>
+          <LibraryHeader></LibraryHeader>
+          <RoutesWithContext></RoutesWithContext>
+        </Router>
+      </UserProvider>
+    </ThemeProvider>
   );
 }
 
