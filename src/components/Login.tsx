@@ -4,7 +4,6 @@ import "../css/login.css";
 import UserContext from "./UserContext";
 
 //import "../css/header.css";
-import { error } from "console";
 
 export default function Login() {
   const [username, setUsername, jwtToken, setJwtToken] =
@@ -39,13 +38,13 @@ export default function Login() {
         if (response.status === 200) {
           return response.text();
         } else {
-          throw new Error(
-            "Neplatny pokus o prihlaseni - bud spatne jmeno a heslo nebo server neodpovida"
-          );
+          return response.text().then((errorText) => {
+            setError(errorText);
+            throw new Error(errorText);
+          });
         }
       })
       .then((response) => {
-        console.log("Nastavim jwt token");
         if (response != null) {
           var tokens = response.split(".");
           console.log(response);

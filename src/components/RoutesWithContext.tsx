@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Routes, Route } from "react-router-dom";
 import ErrorPage from "./ErrorPage";
 import HomePage from "./HomePage";
+import RegisterPage from "./RegisterPage";
 import UserContext from "./UserContext";
 import CalendarPage from "./CalendarPage";
 import MyTermsPage from "./MyTermsPage";
@@ -14,6 +15,7 @@ function RoutesWithContext() {
   return username == null ? (
     <Routes>
       <Route path="/" element={<HomePage></HomePage>} />
+      <Route path="/registrace" element={<RegisterPage></RegisterPage>} />
       <Route path="*" element={<ErrorPage></ErrorPage>} />
     </Routes>
   ) : (

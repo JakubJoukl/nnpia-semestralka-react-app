@@ -1,0 +1,36 @@
+.registerContainer {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    background-color:#1976d2;
+    width: 50%;
+    padding: 20px;
+    margin: auto;
+    border-radius: 3px;
+}
+.registerInput{
+    all: unset;
+    background-color: #3f82cc;
+    border: 0px;
+    border-radius: 4px;
+    padding: 5px;
+    margin-top: 5px;
+}
+.registerButton{
+    margin-top: 20px;
+    background-color: #3f82cc;
+    border: 0px;
+    /*box-shadow: 0px 0px 2px 2px #3f82cc;*/
+    box-sizing: border-box;
+    border-radius: 4px;
+    color: whitesmoke;
+    font-weight: 700;
+    padding: 20px;
+}
+.registerCover{
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    display: flex;
+    align-items: center;
+}

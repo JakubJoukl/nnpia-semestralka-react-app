@@ -14,9 +14,10 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import logoImg from "../assets/logo.png";
 import "../css/image.css";
-import { ButtonBase } from "@mui/material";
+import { Alert, ButtonBase, Collapse } from "@mui/material";
 import Login from "./Login";
 import { Link } from "react-router-dom";
+import MyAlert from "./MyAlert";
 
 const settings = ["Odhlásit se"];
 
@@ -51,6 +52,19 @@ function ResponsiveAppBar() {
     setJwtToken(null);
     setAnchorElUser(null);
   };
+
+  function registerPage() {
+    return (
+      <Link to="/registrace">
+        <Button
+          onClick={handleCloseNavMenu}
+          sx={{ my: 2, color: "white", display: "block" }}
+        >
+          Registrace
+        </Button>
+      </Link>
+    );
+  }
 
   function additionalPages() {
     return (
@@ -202,12 +216,15 @@ function ResponsiveAppBar() {
                 O mě
               </Button>
             </Link>
-            {username == null || jwtToken == null ? "" : additionalPages()}
+            {username == null || jwtToken == null
+              ? registerPage()
+              : additionalPages()}
           </Box>
 
           {username == null || jwtToken == null ? loginPart() : logoutPart()}
         </Toolbar>
       </Container>
+      <MyAlert></MyAlert>
     </AppBar>
   );
 }
