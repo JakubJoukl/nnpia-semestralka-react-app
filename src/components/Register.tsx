@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import "../css/login.css";
 import "../css/register.css";
-import UserContext from "./UserContext";
+import MyAlert from "./MyAlert";
 
 function Register() {
   const [usernameForm, setUsernameForm] = useState("");
@@ -10,10 +10,8 @@ function Register() {
   const [surname, setSurname] = useState("");
   const [birthDate, setBirthDate] = useState(new Date());
 
+  const [open, setOpen] = useState(true);
   const [error, setError] = useState("");
-  if (error !== "") {
-    throw error;
-  }
 
   let telo = JSON.stringify({
     username: usernameForm,
@@ -33,18 +31,27 @@ function Register() {
         "Content-Type": "application/json",
       },
       body: telo,
-    }).then((response) => {
-      console.log(
-        "Request probehl, status: " + response.status + ", odpoved: " + response
-      );
-      if (response.status === 200 || response.status === 201) {
-        return response.text();
-      } else {
-        return response.text().then((errorText) => {
-          setError(errorText);
-        });
-      }
-    });
+    })
+      .then((response) => {
+        console.log(
+          "Request probehl, status: " +
+            response.status +
+            ", odpoved: " +
+            response
+        );
+        if (response.status === 200 || response.status === 201) {
+          return response.text();
+        } else {
+          return response.text().then((errorText) => {
+            setError(errorText);
+            setOpen(true);
+          });
+        }
+      })
+      .catch((error) => {
+        setError(error);
+        setOpen(true);
+      });
   };
 
   return (
@@ -98,6 +105,11 @@ function Register() {
           className="registerButton"
           onClick={handleRegister}
         />
+        {error && (
+          <MyAlert open={open} setOpen={setOpen}>
+            {error}
+          </MyAlert>
+        )}
       </div>
     </div>
   );

@@ -11,16 +11,22 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import UserContext from "./UserContext";
 import moment from "moment";
+import MyAlert from "./MyAlert";
+import { useState } from "react";
 
 const SERVER_OPTIONS = {
   useCursorPagination: false,
 };
+
+const [open, setOpen] = React.useState(true);
+const [error, setError] = React.useState("");
 
 // Vlastní asynchronní funkce pro získání dat
 const fetchData = async (paginationModel, jwtToken, method, url) => {
   const { page } = paginationModel;
   // Zde provedete svůj asynchronní požadavek na získání dat z vašeho API
   // Například:
+  let data = null;
   let pageInfo = url.includes("?")
     ? `&pageNumber=${page}&asc=true`
     : `?pageNumber=${page}&asc=true`;
@@ -32,9 +38,16 @@ const fetchData = async (paginationModel, jwtToken, method, url) => {
       "Content-Type": "text/plain;charset=UTF-8",
       Authorization: "Bearer " + jwtToken,
     },
+  }).then((response) => {
+    if (response.status == 200 || response.status == 201) {
+      data = response.json();
+    } else {
+      response.text().then((error) => {
+        setOpen(true);
+        setError("Chyba při requestu");
+      });
+    }
   });
-  const data = await response.json();
-  console.log(data);
   return data;
 };
 
@@ -62,11 +75,6 @@ export default function ServerPaginationGrid({
   const [rowCountState, setRowCountState] = React.useState(0);
   const [requestUrlUsedInRequest, setRequestUrlUsedInRequest] =
     React.useState(requestUrl);
-
-  const [error, setError] = React.useState("");
-  if (error !== "") {
-    throw error;
-  }
 
   // Funkce pro vytvoření sloupce Actions
   const createActionsColumn = () => {
@@ -121,10 +129,13 @@ export default function ServerPaginationGrid({
         method,
         requestUrlUsedInRequest
       );
-      setRows(data.data); // Nastavte nová data
-      setRowCountState(data.pocet); // Nastavte celkový počet řádků
+      if (data != null && data.data != null) {
+        setRows(data.data); // Nastavte nová data
+        setRowCountState(data.pocet); // Nastavte celkový počet řádků
+      }
     } catch (error) {
-      setError("Chyba při načítání dat: " + error);
+      setOpen(true);
+      setError("Chyba při requestu");
     }
     setIsLoading(false);
   };
@@ -178,6 +189,11 @@ export default function ServerPaginationGrid({
         paginationMode="server"
         onPaginationModelChange={setPaginationModel}
       />
+      {error && (
+        <MyAlert open={open} setOpen={setOpen}>
+          {error}
+        </MyAlert>
+      )}
     </div>
   );
 }

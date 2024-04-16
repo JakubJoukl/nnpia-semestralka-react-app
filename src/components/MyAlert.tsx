@@ -1,22 +1,26 @@
-import { Collapse, Alert, IconButton } from "@mui/material";
+import { Collapse, Alert, IconButton, Snackbar } from "@mui/material";
 import React from "react";
 
-interface Props {
+/*interface Props {
   children: string;
-}
+  open: boolean;
+  setOpen: (event?: React.SyntheticEvent | Event, reason?: string) => void;
+}*/
 
-function MyAlert({ children }: Props) {
-  const [open, setOpen] = React.useState(true);
-  const [message, setMessage] = React.useState(children);
+function MyAlert({ children, open, setOpen }) {
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   return (
-    <Collapse
-      in={open}
-      sx={{
-        minHeight: "unset",
-        borderRadius: "0px",
-      }}
-    >
+    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
       <Alert
         sx={{
           minHeight: "unset",
@@ -28,9 +32,9 @@ function MyAlert({ children }: Props) {
           setOpen(false);
         }}
       >
-        {message}
+        {children}
       </Alert>
-    </Collapse>
+    </Snackbar>
   );
 }
 
