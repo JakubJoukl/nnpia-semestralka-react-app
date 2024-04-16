@@ -57,6 +57,7 @@ export default function ServerPaginationGrid({
     pageSize: 10,
   });
   const [isLoading, setIsLoading] = React.useState(false);
+  const [canUseDateCall, setCanUseDateCall] = React.useState(false); //ošklivé ošetření bugu
   const [rows, setRows] = React.useState([]);
   const [rowCountState, setRowCountState] = React.useState(0);
   const [requestUrlUsedInRequest, setRequestUrlUsedInRequest] =
@@ -135,17 +136,23 @@ export default function ServerPaginationGrid({
 
   if (trackedDate != null) {
     React.useEffect(() => {
-      setRequestUrlUsedInRequest(
-        `http://localhost:8080/api/v1/vypsaneTerminy/${trackedDate["$D"]}-${
-          trackedDate["$M"] + 1
-        }-${trackedDate["$y"]}`
-      );
-      console.log(requestUrlUsedInRequest);
+      if (canUseDateCall) {
+        if (trackedDate != undefined && trackedDate != null) {
+          console.log(trackedDate);
+          console.log(requestUrlUsedInRequest);
+          setRequestUrlUsedInRequest(
+            `http://localhost:8080/api/v1/vypsaneTerminy/${trackedDate["$D"]}-${
+              trackedDate["$M"] + 1
+            }-${trackedDate["$y"]}`
+          );
+        }
+      } else {
+        setCanUseDateCall(true);
+      }
     }, [trackedDate]);
   }
 
   React.useEffect(() => {
-    console.log(requestUrlUsedInRequest);
     fetchDataAndUpdateState();
   }, [requestUrlUsedInRequest]);
 

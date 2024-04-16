@@ -18,14 +18,12 @@ const theme = createTheme(coreCsCZ);
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <MyErrorBoundary>
-        <UserProvider>
-          <Router>
-            <LibraryHeader></LibraryHeader>
-            <RoutesWithContext></RoutesWithContext>
-          </Router>
-        </UserProvider>
-      </MyErrorBoundary>
+      <UserProvider>
+        <Router>
+          <LibraryHeader></LibraryHeader>
+          <RoutesWithContext></RoutesWithContext>
+        </Router>
+      </UserProvider>
     </ThemeProvider>
   );
 }
