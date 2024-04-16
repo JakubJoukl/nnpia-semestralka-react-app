@@ -10,18 +10,22 @@ import RoutesWithContext from "./components/RoutesWithContext";
 import { ThemeProvider } from "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
 import { csCZ as coreCsCZ } from "@mui/material/locale";
+import MyAlert from "./components/MyAlert";
+import MyErrorBoundary from "./components/MyErrorBoundary";
 
 const theme = createTheme(coreCsCZ);
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <UserProvider>
-        <Router>
-          <LibraryHeader></LibraryHeader>
-          <RoutesWithContext></RoutesWithContext>
-        </Router>
-      </UserProvider>
+      <MyErrorBoundary>
+        <UserProvider>
+          <Router>
+            <LibraryHeader></LibraryHeader>
+            <RoutesWithContext></RoutesWithContext>
+          </Router>
+        </UserProvider>
+      </MyErrorBoundary>
     </ThemeProvider>
   );
 }

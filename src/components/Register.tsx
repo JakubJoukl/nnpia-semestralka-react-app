@@ -10,6 +10,11 @@ function Register() {
   const [surname, setSurname] = useState("");
   const [birthDate, setBirthDate] = useState(new Date());
 
+  const [error, setError] = useState("");
+  if (error !== "") {
+    throw error;
+  }
+
   let telo = JSON.stringify({
     username: usernameForm,
     heslo: password,
@@ -28,26 +33,18 @@ function Register() {
         "Content-Type": "application/json",
       },
       body: telo,
-    })
-      .then((response) => {
-        console.log(
-          "Request probehl, status: " +
-            response.status +
-            ", odpoved: " +
-            response
-        );
-        if (response.status === 200 || response.status === 201) {
-          return response.text();
-        } else {
-          return response.text().then((errorText) => {
-            throw new Error(errorText);
-          });
-        }
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => console.error(error));
+    }).then((response) => {
+      console.log(
+        "Request probehl, status: " + response.status + ", odpoved: " + response
+      );
+      if (response.status === 200 || response.status === 201) {
+        return response.text();
+      } else {
+        return response.text().then((errorText) => {
+          setError(errorText);
+        });
+      }
+    });
   };
 
   return (

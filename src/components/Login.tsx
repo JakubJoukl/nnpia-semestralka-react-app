@@ -12,6 +12,11 @@ export default function Login() {
   const [usernameForm, setUsernameForm] = useState("");
   const [password, setPassword] = useState("");
 
+  const [error, setError] = useState("");
+  if (error !== "") {
+    throw error;
+  }
+
   const handleLogin = () => {
     console.log("Uživatelské jméno:", usernameForm);
     console.log("Heslo:", password);
@@ -27,38 +32,32 @@ export default function Login() {
         "Content-Type": "text/plain;charset=UTF-8",
         Authorization: "Basic " + base64encodedData,
       },
-    })
-      .then((response) => {
-        console.log(
-          "Request probehl, status: " +
-            response.status +
-            ", odpoved: " +
-            response
-        );
-        if (response.status === 200) {
-          return response.text();
-        } else {
-          return response.text().then((errorText) => {
-            setError(errorText);
-            throw new Error(errorText);
-          });
-        }
-      })
-      .then((response) => {
-        if (response != null) {
-          var tokens = response.split(".");
-          console.log(response);
-          let tokenScope = JSON.parse(atob(tokens[1]));
-          console.log(JSON.parse(atob(tokens[0])));
-          console.log(JSON.parse(atob(tokens[1])));
-          setUsername(usernameForm);
-          setJwtToken(response);
+    }).then((response) => {
+      console.log(
+        "Request probehl, status: " + response.status + ", odpoved: " + response
+      );
+      if (response.status === 200) {
+        return response.text().then((response) => {
+          if (response != null) {
+            var tokens = response.split(".");
+            console.log(response);
+            let tokenScope = JSON.parse(atob(tokens[1]));
+            console.log(JSON.parse(atob(tokens[0])));
+            console.log(JSON.parse(atob(tokens[1])));
+            setUsername(usernameForm);
+            setJwtToken(response);
 
-          console.log("Username: " + useContext(UserContext).username);
-          console.log("Token: " + useContext(UserContext).jwtToken);
-        }
-      })
-      .catch((error) => console.error(error));
+            console.log("Username: " + useContext(UserContext).username);
+            console.log("Token: " + useContext(UserContext).jwtToken);
+          }
+        });
+      } else {
+        return response.text().then((errorText) => {
+          setError("Chyba při přihlašování.");
+          //throw new Error(errorText);
+        });
+      }
+    });
   };
 
   return (

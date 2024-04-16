@@ -8,3 +8,7 @@ body, html {
     display: flex;
     flex-direction: column;
 }
+
+.MuiCollapse-root{
+  min-height: unset !important;
+}

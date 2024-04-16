@@ -9,26 +9,21 @@ function MyAlert({ children }: Props) {
   const [open, setOpen] = React.useState(true);
   const [message, setMessage] = React.useState(children);
 
-  React.useEffect(() => {
-    handleMessage();
-  }, [message]);
-
-  function handleMessage() {
-    try {
-      let decodedMessage = JSON.parse(message);
-      let messageWithRows = "";
-      decodedMessage.forEach((element: string) => {
-        messageWithRows += element + "/n";
-      });
-      setMessage(messageWithRows);
-    } catch (e) {
-      setMessage(message);
-    }
-  }
-
   return (
-    <Collapse in={open}>
+    <Collapse
+      in={open}
+      sx={{
+        minHeight: "unset",
+        borderRadius: "0px",
+      }}
+    >
       <Alert
+        sx={{
+          minHeight: "unset",
+          borderRadius: "0px",
+        }}
+        variant="filled"
+        severity="error"
         onClick={() => {
           setOpen(false);
         }}

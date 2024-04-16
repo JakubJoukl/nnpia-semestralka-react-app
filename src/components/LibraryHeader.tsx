@@ -224,7 +224,6 @@ function ResponsiveAppBar() {
           {username == null || jwtToken == null ? loginPart() : logoutPart()}
         </Toolbar>
       </Container>
-      <MyAlert></MyAlert>
     </AppBar>
   );
 }

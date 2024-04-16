@@ -62,6 +62,11 @@ export default function ServerPaginationGrid({
   const [requestUrlUsedInRequest, setRequestUrlUsedInRequest] =
     React.useState(requestUrl);
 
+  const [error, setError] = React.useState("");
+  if (error !== "") {
+    throw error;
+  }
+
   // Funkce pro vytvoření sloupce Actions
   const createActionsColumn = () => {
     return {
@@ -80,7 +85,6 @@ export default function ServerPaginationGrid({
               label="Update"
               onClick={async () => {
                 await doUpdateAction(id);
-                console.log("PAWNS");
                 fetchDataAndUpdateState();
               }}
               color="inherit"
@@ -108,7 +112,6 @@ export default function ServerPaginationGrid({
   };
 
   const fetchDataAndUpdateState = async () => {
-    console.log("MITTENS");
     setIsLoading(true);
     try {
       const data = await fetchData(
@@ -117,11 +120,10 @@ export default function ServerPaginationGrid({
         method,
         requestUrlUsedInRequest
       );
-      console.log("SNOW");
       setRows(data.data); // Nastavte nová data
       setRowCountState(data.pocet); // Nastavte celkový počet řádků
     } catch (error) {
-      console.error("Chyba při načítání dat:", error);
+      setError("Chyba při načítání dat: " + error);
     }
     setIsLoading(false);
   };
@@ -133,7 +135,6 @@ export default function ServerPaginationGrid({
 
   if (trackedDate != null) {
     React.useEffect(() => {
-      console.log("Kocka");
       setRequestUrlUsedInRequest(
         `http://localhost:8080/api/v1/vypsaneTerminy/${trackedDate["$D"]}-${
           trackedDate["$M"] + 1
