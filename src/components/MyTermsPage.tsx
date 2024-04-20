@@ -19,7 +19,7 @@ function MyTermsPage() {
           width: 200,
         },
         {
-          field: "vypsanyTermin",
+          field: "trvaniOd",
           headerName: "Trvání od",
           type: "datetime",
           width: 200,
@@ -51,7 +51,7 @@ function MyTermsPage() {
       method={`GET`}
       includeDelete={true}
       doDeleteAction={async (id) => {
-        await fetch(
+        return fetch(
           "http://localhost:8080/api/v1/terminyUzivatele/zrusRezervaciTerminu",
           {
             method: "POST",

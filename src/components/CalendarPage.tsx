@@ -51,7 +51,7 @@ export default function CalendarPage() {
         doDeleteAction={null}
         includeUpdate={true}
         doUpdateAction={async (id) => {
-          await fetch(
+          return fetch(
             "http://localhost:8080/api/v1/vypsaneTerminy/vytvorRezervaci",
             {
               method: "POST",

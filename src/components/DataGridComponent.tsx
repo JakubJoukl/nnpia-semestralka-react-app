@@ -18,39 +18,6 @@ const SERVER_OPTIONS = {
   useCursorPagination: false,
 };
 
-const [open, setOpen] = React.useState(true);
-const [error, setError] = React.useState("");
-
-// Vlastní asynchronní funkce pro získání dat
-const fetchData = async (paginationModel, jwtToken, method, url) => {
-  const { page } = paginationModel;
-  // Zde provedete svůj asynchronní požadavek na získání dat z vašeho API
-  // Například:
-  let data = null;
-  let pageInfo = url.includes("?")
-    ? `&pageNumber=${page}&asc=true`
-    : `?pageNumber=${page}&asc=true`;
-
-  const response = await fetch(url + pageInfo, {
-    method: method,
-    mode: "cors",
-    headers: {
-      "Content-Type": "text/plain;charset=UTF-8",
-      Authorization: "Bearer " + jwtToken,
-    },
-  }).then((response) => {
-    if (response.status == 200 || response.status == 201) {
-      data = response.json();
-    } else {
-      response.text().then((error) => {
-        setOpen(true);
-        setError("Chyba při requestu");
-      });
-    }
-  });
-  return data;
-};
-
 export default function ServerPaginationGrid({
   columns,
   requestUrl,
@@ -62,6 +29,50 @@ export default function ServerPaginationGrid({
   doUpdateAction,
   trackedDate,
 }) {
+  const [open, setOpen] = React.useState(true);
+  const [error, setError] = React.useState("");
+
+  const fetchData = async (
+    paginationModel,
+    jwtToken,
+    method,
+    url,
+    sortModel
+  ) => {
+    const { page } = paginationModel;
+    let data = null;
+    let pageInfo = url.includes("?")
+      ? `&pageNumber=${page}&asc=true`
+      : `?pageNumber=${page}&asc=true`;
+
+    let sortParams = "";
+    for (let i = 0; i < sortModel.length; i++) {
+      let paramRow = sortModel[i];
+      sortParams += "&sort=" + paramRow.field + "," + paramRow.sort;
+    }
+
+    console.log(url + pageInfo + sortParams);
+
+    const response = await fetch(url + pageInfo + sortParams, {
+      method: method,
+      mode: "cors",
+      headers: {
+        "Content-Type": "text/plain;charset=UTF-8",
+        Authorization: "Bearer " + jwtToken,
+      },
+    }).then((response) => {
+      if (response.status == 200 || response.status == 201) {
+        data = response.json();
+      } else {
+        response.text().then((error) => {
+          setOpen(true);
+          setError("Chyba při requestu: " + error);
+        });
+      }
+    });
+    return data;
+  };
+
   const [username, setUsername, jwtToken, setJwtToken] =
     React.useContext(UserContext);
 
@@ -69,6 +80,9 @@ export default function ServerPaginationGrid({
     page: 0,
     pageSize: 10,
   });
+
+  const [sortModel, setSortModel] = React.useState({});
+
   const [isLoading, setIsLoading] = React.useState(false);
   const [canUseDateCall, setCanUseDateCall] = React.useState(false); //ošklivé ošetření bugu
   const [rows, setRows] = React.useState([]);
@@ -93,7 +107,16 @@ export default function ServerPaginationGrid({
               icon={<AddCircleIcon />}
               label="Update"
               onClick={async () => {
-                await doUpdateAction(id);
+                let result = await doUpdateAction(id).then((response) => {
+                  if (response.status == 200 || response.status == 201) {
+                    console.log("Request OK");
+                  } else {
+                    response.text().then((error) => {
+                      setOpen(true);
+                      setError("Chyba při requestu: " + error);
+                    });
+                  }
+                });
                 fetchDataAndUpdateState();
               }}
               color="inherit"
@@ -107,7 +130,16 @@ export default function ServerPaginationGrid({
               icon={<DeleteIcon />}
               label="Delete"
               onClick={async () => {
-                await doDeleteAction(id);
+                await doDeleteAction(id).then((response) => {
+                  if (response.status == 200 || response.status == 201) {
+                    console.log("Request OK");
+                  } else {
+                    response.text().then((error) => {
+                      setOpen(true);
+                      setError("Chyba při requestu: " + error);
+                    });
+                  }
+                });
                 console.log("PAWNS");
                 fetchDataAndUpdateState();
               }}
@@ -122,12 +154,14 @@ export default function ServerPaginationGrid({
 
   const fetchDataAndUpdateState = async () => {
     setIsLoading(true);
+    console.log(sortModel);
     try {
       const data = await fetchData(
         paginationModel,
         jwtToken,
         method,
-        requestUrlUsedInRequest
+        requestUrlUsedInRequest,
+        sortModel
       );
       if (data != null && data.data != null) {
         setRows(data.data); // Nastavte nová data
@@ -135,7 +169,7 @@ export default function ServerPaginationGrid({
       }
     } catch (error) {
       setOpen(true);
-      setError("Chyba při requestu");
+      setError("Chyba při requestu: " + error);
     }
     setIsLoading(false);
   };
@@ -143,7 +177,7 @@ export default function ServerPaginationGrid({
   // Načtení dat při prvním načtení komponenty nebo změně modelu stránkování
   React.useEffect(() => {
     fetchDataAndUpdateState();
-  }, [paginationModel]);
+  }, [paginationModel, sortModel]);
 
   if (trackedDate != null) {
     React.useEffect(() => {
@@ -188,6 +222,8 @@ export default function ServerPaginationGrid({
         paginationModel={paginationModel}
         paginationMode="server"
         onPaginationModelChange={setPaginationModel}
+        sortingMode="server"
+        onSortModelChange={setSortModel}
       />
       {error && (
         <MyAlert open={open} setOpen={setOpen}>
