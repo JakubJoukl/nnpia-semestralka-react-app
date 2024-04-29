@@ -141,7 +141,7 @@ function ResponsiveAppBar() {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <img src={logoImg} alt="Logo" />
+          <img src={logoImg} alt="Logo" className="headerImg" />
           <Typography
             variant="h6"
             noWrap
