@@ -52,9 +52,10 @@ function MyTermsPage() {
       includeDelete={true}
       doDeleteAction={async (id) => {
         return fetch(
-          "http://localhost:8080/api/v1/terminyUzivatele/zrusRezervaciTerminu",
+          "http://localhost:8080/api/v1/terminyUzivatele/zrusRezervaciTerminu/" +
+            id,
           {
-            method: "POST",
+            method: "PUT",
             mode: "cors",
             headers: {
               "Content-Type": "application/json",
